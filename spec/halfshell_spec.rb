@@ -86,16 +86,25 @@ RSpec.describe HalfShell do
     end
 
     context "forwarding" do
-      it "puts should forward to @stdout" do
-        expect(shell.stdout).to receive(:puts)
+      it "puts should forward to @stdin" do
+        expect(shell.stdin).to receive(:puts)
         shell.puts
       end
 
-      it "gets should forward to @stdin" do
-        expect(shell.stdin).to receive(:gets)
-        shell.gets
+    #  it "gets should forward to @stdout" do
+    #    expect(shell.stdout).to receive(:gets)
+    #    shell.gets
+    #  end
+
+    end
+
+    context "reading all the output without blocking" do
+      it "whoami" do
+        shell.puts "whoami"
+        expect(shell.gets).to eq "andy\n"
       end
     end
+
   end
 
   it "has a version number" do

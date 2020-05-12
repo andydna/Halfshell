@@ -17,8 +17,8 @@ module HalfShell
 
 class SH
   extend Forwardable
-  def_delegators :@stdout, :puts
-  def_delegators :@stdin, :gets
+  def_delegators :@stdout, :gets
+  def_delegators :@stdin,  :puts
 
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
