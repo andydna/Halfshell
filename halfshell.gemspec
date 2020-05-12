@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
 
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-doc"
 
   spec.add_dependency "open4", "~> 1.3.4"
 end

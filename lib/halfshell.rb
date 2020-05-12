@@ -92,3 +92,7 @@ class SH
 end
 
 end
+
+def hs
+  HalfShell
+end

@@ -12,6 +12,10 @@ RSpec.describe HalfShell do
       specify 'HalfShell << "ls spec/halfshell_spec.rb"' do
         expect(HalfShell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb"
       end
+
+      specify "sh method; should it be on Kernel or just a def?" do
+        expect(hs << "ls")
+      end
     end
 
     context 'principle of Least Suprise' do
