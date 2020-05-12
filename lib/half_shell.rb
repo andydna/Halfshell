@@ -2,9 +2,9 @@ require "open4"
 
 module AndyDNA
 
-class ShellError < StandardError; end
+class HalfShellError < StandardError; end
 
-class Shell
+class HalfShell
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
   end

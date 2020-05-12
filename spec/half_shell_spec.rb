@@ -1,9 +1,9 @@
 require 'shell'
 require 'pry'
 
-RSpec.describe AndyDNA::Shell do
-  context 'OO interface to subShells' do
-    let(:shell) { AndyDNA::Shell.new }
+RSpec.describe AndyDNA::HalfShell do
+  context 'OO interface to subHalfShells' do
+    let(:shell) { AndyDNA::HalfShell.new }
 
     let(:expect_to_respond_to) do
       lambda { |mthd| expect(shell).to respond_to mthd }
@@ -64,7 +64,7 @@ RSpec.describe AndyDNA::Shell do
         skip "gotta figure out how to not hang"
         expect do
           shell << "mrowlatemymetalworm"
-        end.to raise_error(AndyDNA::ShellError)
+        end.to raise_error(AndyDNA::HalfShellError)
       end
 
       it 'is useful for testing my own programs' do
