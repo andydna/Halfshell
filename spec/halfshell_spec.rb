@@ -1,4 +1,4 @@
-require 'shell'
+require 'halfshell'
 require 'pry'
 
 RSpec.describe AndyDNA::HalfShell do
