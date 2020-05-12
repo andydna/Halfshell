@@ -1,10 +1,16 @@
+require "halfshell/version"
+
 require "open4"
 
-module AndyDNA
+module HalfShell
 
-class HalfShellError < StandardError; end
+  class Error < StandardError; end
 
-class HalfShell
+  def HalfShell.new
+    SH.new
+  end
+
+class SH
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
   end

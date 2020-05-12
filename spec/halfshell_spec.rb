@@ -1,9 +1,6 @@
-require 'halfshell'
-require 'pry'
-
-RSpec.describe AndyDNA::HalfShell do
+RSpec.describe HalfShell do
   context 'OO interface to subHalfShells' do
-    let(:shell) { AndyDNA::HalfShell.new }
+    let(:shell) { HalfShell.new }
 
     let(:expect_to_respond_to) do
       lambda { |mthd| expect(shell).to respond_to mthd }
@@ -68,8 +65,14 @@ RSpec.describe AndyDNA::HalfShell do
       end
 
       it 'is useful for testing my own programs' do
+        skip
         expect(shell << "./hello").to match /there/
       end
     end
   end
+
+  it "has a version number" do
+    expect(HalfShell::VERSION).not_to be nil
+  end
+
 end
