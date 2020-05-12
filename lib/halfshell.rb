@@ -96,3 +96,4 @@ end
 def hs
   HalfShell
 end
+alias :sh :hs
