@@ -1,6 +1,7 @@
 require "halfshell/version"
 
 require "open4"
+require "forwardable"
 
 module HalfShell
 
@@ -15,6 +16,10 @@ module HalfShell
   end
 
 class SH
+  extend Forwardable
+  def_delegators :@stdout, :puts
+  def_delegators :@stdin, :gets
+
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
     def_inspects

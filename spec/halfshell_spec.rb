@@ -80,9 +80,21 @@ RSpec.describe HalfShell do
     end
   end
 
-  context "improving repl usability" do
-    fit "STDIN, STDOUT, STDERR inspect well" do
+  context "making it work for me" do
+    it "STDIN, STDOUT, STDERR inspect well" do
       expect(shell.in.inspect).to match /STDIN/
+    end
+
+    context "forwarding" do
+      it "puts should forward to @stdout" do
+        expect(shell.stdout).to receive(:puts)
+        shell.puts
+      end
+
+      it "gets should forward to @stdin" do
+        expect(shell.stdin).to receive(:gets)
+        shell.gets
+      end
     end
   end
 
