@@ -2,6 +2,8 @@ require "open4"
 
 module AndyDNA
 
+class ShellError < StandardError; end
+
 class Shell
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
@@ -37,8 +39,8 @@ class Shell
   def pwd; end
   def cwd; end
 
-  def ls
-    stdin.puts "ls"
+  def ls(*args)
+    stdin.puts "ls #{args.join(' ')}"
     first_line
   end
 

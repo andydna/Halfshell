@@ -52,12 +52,23 @@ RSpec.describe AndyDNA::Shell do
     end
 
     context 'wire up open4' do
-      it 'ls' do
-        expect(shell.ls).to match /lib/
+      it 'ls /' do
+        expect(shell.ls("/")).to match /bin/
       end
 
       it 'shovel in arbitrary commands' do
         expect(shell << "which sh").to match Regexp.new("/bin/sh")
+      end
+
+      it 'what about garbage commands' do
+        skip "gotta figure out how to not hang"
+        expect do
+          shell << "mrowlatemymetalworm"
+        end.to raise_error(AndyDNA::ShellError)
+      end
+
+      it 'is useful for testing my own programs' do
+        expect(shell << "./hello").to match /there/
       end
     end
   end
