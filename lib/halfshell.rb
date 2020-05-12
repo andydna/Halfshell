@@ -17,6 +17,7 @@ module HalfShell
 class SH
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
+    def_inspects
   end
 
   def <<(command)
@@ -89,6 +90,21 @@ class SH
     stdout.each_line.take(2).join # shitty
   end
 
+  def def_inspects
+    # wanna each define_singleton_method.
+    # but how to => expect(@ivar.to_s).to eq('ivar')
+    def @stdin.inspect
+      "<STDIN:IO:fd #{fileno}>"
+    end
+
+    def @stdout.inspect
+      "<STDOUT:IO:fd #{fileno}>"
+    end
+
+    def @stderr.inspect
+      "<STDERR:IO:fd #{fileno}>"
+    end
+  end
 end
 
 end

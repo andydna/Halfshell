@@ -1,9 +1,9 @@
 require 'pry'
 
 RSpec.describe HalfShell do
-  context 'OO subshells' do
-    let(:shell) { HalfShell.new }
+  let(:shell) { HalfShell.new }
 
+  context 'OO subshells' do
     let(:expect_to_respond_to) do
       lambda { |mthd| expect(shell).to respond_to mthd }
     end
@@ -77,6 +77,12 @@ RSpec.describe HalfShell do
         skip
         expect(shell << "./hello").to match /there/
       end
+    end
+  end
+
+  context "improving repl usability" do
+    fit "STDIN, STDOUT, STDERR inspect well" do
+      expect(shell.in.inspect).to match /STDIN/
     end
   end
 
