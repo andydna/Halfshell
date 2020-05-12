@@ -103,6 +103,12 @@ RSpec.describe HalfShell do
         shell.puts "whoami"
         expect(shell.gets).to eq "andy\n"
       end
+
+      fit "cowsay hi" do
+        shell.puts "cowsay hi"
+        #sleep 1 # lame but better than nothing
+        expect(shell.gets).to eq "andy\n"
+      end
     end
 
   end

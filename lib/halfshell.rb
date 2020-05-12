@@ -17,12 +17,23 @@ module HalfShell
 
 class SH
   extend Forwardable
-  def_delegators :@stdout, :gets
+  #def_delegators :@stdout, :gets
   def_delegators :@stdin,  :puts
 
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
     def_inspects
+  end
+
+  def gets
+    got = ""
+    loop do
+      begin
+        got << stdout.read_nonblock(1)
+      rescue IO::EAGAINWaitReadable
+        binding.pry
+      end
+    end
   end
 
   def <<(command)
