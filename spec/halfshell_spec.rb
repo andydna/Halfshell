@@ -1,3 +1,5 @@
+require 'pry'
+
 RSpec.describe HalfShell do
   context 'OO subshells' do
     let(:shell) { HalfShell.new }
@@ -23,7 +25,7 @@ RSpec.describe HalfShell do
       end
 
       it '#login?' do
-        expect(shell).to respond_to :login?
+        expect(shell.login?).to be false
       end
 
       it '#cd #pwd #cwd' do
@@ -32,10 +34,6 @@ RSpec.describe HalfShell do
 
       it '#ls #ll' do
         [:ls, :ll,].each(&expect_to_respond_to)
-      end
-
-      it '#clear' do
-        [:clear].each(&expect_to_respond_to)
       end
 
       it '#su' do

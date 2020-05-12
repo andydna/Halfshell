@@ -43,7 +43,10 @@ class SH
   end
   alias :err :stderr
 
-  def login?; end # $0[0] == '-'
+  def login?
+    stdin.puts "echo $0"
+    stdout.gets[0] == "-"
+  end
 
   def cd; end
   def pwd
