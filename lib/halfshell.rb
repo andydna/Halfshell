@@ -10,6 +10,10 @@ module HalfShell
     SH.new
   end
 
+  def HalfShell.<<(command)
+    new << command
+  end
+
 class SH
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
@@ -42,7 +46,10 @@ class SH
   def login?; end # $0[0] == '-'
 
   def cd; end
-  def pwd; end
+  def pwd
+    stdin.puts "pwd"
+    first_line
+  end
   def cwd; end
 
   def ls(*args)
