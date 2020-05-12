@@ -1,9 +1,9 @@
 require 'pry'
 
 RSpec.describe HalfShell do
-  context 'OO subshells' do
-    let(:shell) { HalfShell.new }
+  let(:shell) { HalfShell.new }
 
+  context 'OO subshells' do
     let(:expect_to_respond_to) do
       lambda { |mthd| expect(shell).to respond_to mthd }
     end
@@ -11,6 +11,11 @@ RSpec.describe HalfShell do
     context 'dead simple' do
       specify 'HalfShell << "ls spec/halfshell_spec.rb"' do
         expect(HalfShell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb"
+      end
+
+      specify "hs === sh === HalfShell" do
+        expect(hs << "ls")
+        expect(sh << "ls")
       end
     end
 
@@ -71,6 +76,24 @@ RSpec.describe HalfShell do
       it 'is useful for testing my own programs' do
         skip
         expect(shell << "./hello").to match /there/
+      end
+    end
+  end
+
+  context "making it work for me" do
+    it "STDIN, STDOUT, STDERR inspect well" do
+      expect(shell.in.inspect).to match /STDIN/
+    end
+
+    context "forwarding" do
+      it "puts should forward to @stdout" do
+        expect(shell.stdout).to receive(:puts)
+        shell.puts
+      end
+
+      it "gets should forward to @stdin" do
+        expect(shell.stdin).to receive(:gets)
+        shell.gets
       end
     end
   end
