@@ -1,9 +1,15 @@
 RSpec.describe HalfShell do
-  context 'OO interface to subHalfShells' do
+  context 'OO subshells' do
     let(:shell) { HalfShell.new }
 
     let(:expect_to_respond_to) do
       lambda { |mthd| expect(shell).to respond_to mthd }
+    end
+
+    context 'dead simple' do
+      specify 'HalfShell << "ls spec/halfshell_spec.rb"' do
+        expect(HalfShell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb"
+      end
     end
 
     context 'principle of Least Suprise' do
@@ -43,14 +49,14 @@ RSpec.describe HalfShell do
 
     context 'dynamic messages mean arguments to commands' do
 
-      it '#lsa #lsb #lsc ... #lsz' do
+      it '#lsa = `ls -a`, #lsb, #lsc, ... #lsz' do
         ('a'..'z').map{|ltr|"ls#{ltr}".to_sym}.each(&expect_to_respond_to)
       end
     end
 
     context 'wire up open4' do
-      it 'ls /' do
-        expect(shell.ls("/")).to match /bin/
+      it 'pwd' do
+        expect(shell.pwd).to match /#{File.expand_path(Dir.pwd)}/i
       end
 
       it 'shovel in arbitrary commands' do
