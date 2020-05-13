@@ -1,32 +1,24 @@
 require 'pry'
 
-RSpec.describe HalfShell do
-  let(:half_shell) { HalfShell.new }
+RSpec.describe Halfshell do
+  let(:half_shell) { Halfshell.new }
 
   context 'OO subshells' do
     context 'dead simple' do
-      specify 'HalfShell << "ls spec/halfshell_spec.rb"' do
-        expect(HalfShell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb\n"
+      fspecify 'Halfshell << "ls spec/halfshell_spec.rb"' do
+        expect(Halfshell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb\n"
       end
 
-      specify "hs === sh === HalfShell" do
+      specify "hs === sh === Halfshell" do
         expect(hs << "ls /").to match /bin/
         expect(sh << "ls /").to match /bin/
-        expect(HalfShell << "ls /").to match /bin/
+        expect(Halfshell << "ls /").to match /bin/
       end
     end
 
     context 'principle of Least Suprise' do
       let(:expect_to_respond_to) do
         lambda { |mthd| expect(half_shell).to respond_to mthd }
-      end
-
-      it '#stdin #stdout #stderr #pid' do
-        [:stdin, :stdout, :stderr, :pid].each(&expect_to_respond_to)
-      end
-
-      it 'aliases #in #out #err' do
-        [:in, :out, :err].each(&expect_to_respond_to)
       end
 
       it '#login?' do
@@ -73,14 +65,14 @@ RSpec.describe HalfShell do
       it 'what about garbage commands' do
         expect do
           half_shell << "mrowlatemymetalworm"
-        end.to raise_error(HalfShell::Error)
+        end.to raise_error(Halfshell::Error)
       end
     end
   end
 
   context "reading standard error" do
     it 'is a bad method name but ill change it' do
-      half_shell.puts "asdfasfasfsadfd"
+      half_shell.type "asdfasfasfsadfd"
       expect(half_shell.gets_err).to match /command not found/
     end
   end
@@ -92,15 +84,27 @@ RSpec.describe HalfShell do
     end
 
     context 'fixing shit' do
+      it 'WAIT should be greater than zero' do
+        expect(Halfshell::WAIT).to be > 0
+      end
+
       it 'should reset @try every <<' do
         10.times { half_shell << "ls" }
         expect(half_shell.instance_variable_get(:@try)).to eq 0
       end
 
-      it 'SH should use object_id for inspect instead of ?mem addr?' do
-        raph = HalfShell.new
+      it 'Typist should use object_id for inspect instead of ?mem addr?' do
+        raph = Halfshell.new
         expect(raph.inspect).not_to match /0x0/
       end
+    end
+  end
+
+  context "some commands" do
+    let(:mario) { Halfshell.new }
+    it "su" do
+      super_mario = mario.su
+      binding.pry
     end
   end
 
@@ -110,7 +114,7 @@ RSpec.describe HalfShell do
         fiberator = class_double(FibonacciEnumerator)
         expect(fiberator).to receive(:from).with(3)
         stub_const('FibonacciEnumerator', fiberator)
-        HalfShell.new
+        Halfshell.new
       end
     end
 
@@ -120,7 +124,7 @@ RSpec.describe HalfShell do
         open_four = class_double(Open4)
         expect(open_four).to receive(:popen4)
         stub_const('Open4', open_four)
-        HalfShell.new
+        Halfshell.new
       end
 
       context "I can mock it; want a struct with 3 IOs and an int for pid" do
@@ -129,14 +133,14 @@ RSpec.describe HalfShell do
         # so call it a shell
         let(:sub_shell) { spy }
         
-        it "SH#puts calls @slave#stdin then @slave#puts" do
-          expect(sub_shell).to receive(:stdin)
+        it "Typist#type calls @terminal#stdin then @terminal#puts" do
+          expect(sub_shell).to receive(:in)
           expect(sub_shell).to receive(:puts)
-          HalfShell::SH.new(slave: sub_shell).puts
+          Halfshell::Typist.new(terminal: sub_shell).type
         end
 
         it "#gets reads without blocking" do
-          half_shell.puts "cowsay hi"
+          half_shell.type "cowsay hi"
           expect(half_shell.gets).to match /< hi >/
         end
         specify "" do

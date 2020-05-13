@@ -1,64 +1,62 @@
+require 'pry'
 require 'halfshell/version'
+require 'halfshell/fibonacci_generator'
 require "open4"
 
-module HalfShell
-  OPEN4_RETURNS = [:pid, :stdin, :stdout, :stderr]
-  WAIT = 1/1000
+module Halfshell
+  WAIT = 1.0/10000
+  OPEN4_RETURNS = [:pid, :in, :out, :err]
 
   class Error < StandardError; end
+  Terminal = Struct.new(:in, :out, :err, :pid, keyword_init: true)
 
-  def HalfShell.new
-    SH.new(slave: SubShell.new(**OPEN4_RETURNS.zip(Open4::popen4("sh")).to_h))
+  def Halfshell.new
+    Typist.new(terminal: Terminal.new(**OPEN4_RETURNS.zip(Open4::popen4("sh")).to_h))
   end
 
-  def HalfShell.<<(command)
+  def Halfshell.<<(command)
     new << command
   end
 
-  SubShell = Struct.new(:stdin, :stdout, :stderr, :pid, keyword_init: true)
-
-class SH
-  def initialize(slave:, backoff: FibonacciEnumerator.from(3))
-    @slave = slave;
-    def_inspects
+class Typist
+  def initialize(terminal:, backoff: FibonacciEnumerator.from(3))
+    @terminal = terminal;
+    # def_inspects
 
     @try = 0
-    @limit = 1000
+    @limit = 20
     @backoff = backoff
   end
 
-  attr_reader :pid, :stdin, :stdout, :stderr
-  alias :in :stdin
-  alias :out :stdout
-  alias :err :stderr
-
-  def puts(*what)
-    @slave.stdin.puts(*what)
+  def type(*what)
+    @terminal.in.puts(*what)
+    self
   end
 
   def <<(command)
-    @slave.stdin.puts command
+    @terminal.in.puts command
     gets
   end
 
   def gets_err
-    return read_nonblock_loop(@slave.stderr)
+    return read_nonblock_loop(@terminal.err)
   end
 
   def gets
-    return read_nonblock_loop(@slave.stdout)
+    return read_nonblock_loop(@terminal.out)
   end
   alias :gets_in :gets
 
   def login?
-    @slave.stdin.puts "echo $0"
-    @slave.stdout.gets[0] == "-"
+    @terminal.in.puts "echo $0"
+    @terminal.out.gets[0] == "-"
   end
 
   def cd(*args)
-    @slave.stdin.puts "cd #{args.join(' ')}"
+    @terminal.in.puts "cd #{args.join(' ')}"
   end
 
+  # actual commands
   def pwd
     self.<< "pwd"
   end
@@ -78,7 +76,7 @@ class SH
 
   alias :old_inspect :inspect
   def inspect
-    "#<#SH:#{object_id}>"
+    "#<#Typist:#{object_id}>"
   end
 
   def method_missing(mthd, *args, &block)
@@ -89,15 +87,20 @@ class SH
     mthd.to_s.match? /ls|tar|ps/ || super
   end
 
+  def twiddle_thumbs
+    sleep(WAIT*@backoff.next)
+  end
+
   private
 
-  def def_inspects
-    %w[stdin stdout stderr].each do |io|
-      send(io.to_sym).define_singleton_method(:inspect) do
-        "#<#{io.upcase}:IO:fd #{fileno}>"
-      end
-    end
-  end
+  # belongs on terminal
+#  def def_inspects
+#    %w[in out err].each do |io|
+#      send(io.to_sym).define_singleton_method(:inspect) do
+#        "#<#{io.upcase}:IO:fd #{fileno}>"
+#      end
+#    end
+#  end
 
   def read_nonblock_loop(io)
     got = ""
@@ -105,7 +108,7 @@ class SH
       begin
         got << io.read_nonblock(1)
       rescue IO::EAGAINWaitReadable
-        raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
+        raise(Error, "no in") if (@try += 1) > @limit # should just return err; later
         if got.empty?
           sleep(WAIT*@backoff.next)
           return read_nonblock_loop(io)
@@ -121,6 +124,6 @@ end
 end
 
 def hs
-  HalfShell
+  Halfshell
 end
 alias :sh :hs
