@@ -100,19 +100,20 @@ RSpec.describe HalfShell do
       expect(shell.gets).to match /< hi >/
     end
 
+    context 'sleeping longer' do
+      it 'generates acceleratingly increasing integers' do
+        first  = shell.sleep_longer.next
+        second = shell.sleep_longer.next
+        third  = shell.sleep_longer.next
+        expect(first).to be < second
+        expect(second).to be < third
+        expect(second - first).to be < (third - second)
+      end
 
+      it 'might as well save the fib hash to a class var for reuse' do
+        shell.sleep_longer.next
+        expect(HalfShell::SH.class_variables).to include :@@fib
+      end
+    end
   end
 end
-
-RSpec.describe HalfShell::SleepGenerator do
-  let(:gen) {HalfShell::SleepGenerator}
-  it 'generates acceleratingly increasing integers' do
-    first  = gen.next
-    second = gen.next
-    third  = gen.next
-    expect(first).to be < second
-    expect(second).to be < third
-    expect(second - first).to be < (third - second)
-  end
-end
-

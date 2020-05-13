@@ -2,12 +2,6 @@ require "open4"
 require "forwardable"
 
 module HalfShell
-  SleepGenerator = Enumerator.new do |yielder|
-    inc  = (3..).step
-    fib = Hash.new{ |h,k| h[k] = k < 2 ? k : h[k-1] + h[k-2] } # https://stackoverflow.com/questions/6418524/fibonacci-one-liner
-    loop {yielder << fib[inc.next]}
-  end
-
   class Error < StandardError; end
 
   def HalfShell.new
@@ -29,6 +23,11 @@ class SH
     def_inspects
   end
 
+  attr_reader :pid, :stdin, :stdout, :stderr
+  alias :in :stdin
+  alias :out :stdout
+  alias :err :stderr
+
   def <<(command)
     stdin.puts command
     gets
@@ -41,6 +40,7 @@ class SH
   def gets
     return read_nonblock_loop(stdout)
   end
+  alias :gets_in :gets
 
   def read_nonblock_loop(io)
     got = ""
@@ -50,7 +50,7 @@ class SH
       rescue IO::EAGAINWaitReadable
         raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
         if got.empty?
-          sleep(1/(1000)) # gotta find a way, a better way
+          sleep((1/100000000000)*sleep_longer.next)
           return read_nonblock_loop(io)
         else
           return got
@@ -59,24 +59,12 @@ class SH
     end
   end
 
-  def pid
-    @pid
+  def sleep_longer
+    @longer ||= Enumerator.new do |yielder|
+      @@fib = Hash.new{ |h,k| h[k] = k < 2 ? k : h[k-1] + h[k-2] } # https://stackoverflow.com/questions/6418524/fibonacci-one-liner
+      loop { yielder << @@fib[(@inc ||= (3..).step).next ] }
+    end
   end
-
-  def stdin
-    @stdin
-  end
-  alias :in :stdin
-
-  def stdout
-    @stdout
-  end
-  alias :out :stdout
-
-  def stderr
-    @stderr
-  end
-  alias :err :stderr
 
   def login?
     stdin.puts "echo $0"
@@ -88,20 +76,17 @@ class SH
   end
 
   def pwd
-    stdin.puts "pwd"
-    gets
+    self.<< "pwd"
   end
 
   def cwd; end
 
   def ls(*args)
-    stdin.puts "ls #{args.join(' ')}"
-    gets
+    self.<< "ls #{args.join(' ')}"
   end
 
   def ll(*args)
-    stdin.puts "ls -l #{args.join(' ')}"
-    gets
+    self.<< "ls -l #{args.join(' ')}"
   end
 
   def lsh; end
@@ -120,16 +105,10 @@ class SH
   private
 
   def def_inspects
-    def stdin.inspect
-      "#<STDIN:IO:fd #{fileno}>"
-    end
-
-    def stdout.inspect
-      "#<STDOUT:IO:fd #{fileno}>"
-    end
-
-    def stderr.inspect
-      "#<STDERR:IO:fd #{fileno}>"
+    %w[stdin stdout stderr].each do |io|
+      send(io.to_sym).define_singleton_method(:inspect) do
+        "#<#{io.upcase}:IO:fd #{fileno}>"
+      end
     end
   end
 end
