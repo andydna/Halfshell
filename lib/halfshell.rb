@@ -42,30 +42,6 @@ class SH
   end
   alias :gets_in :gets
 
-  def read_nonblock_loop(io)
-    got = ""
-    loop do
-      begin
-        got << io.read_nonblock(1)
-      rescue IO::EAGAINWaitReadable
-        raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
-        if got.empty?
-          sleep((1/100000000000)*sleep_longer.next)
-          return read_nonblock_loop(io)
-        else
-          return got
-        end
-      end
-    end
-  end
-
-  def sleep_longer
-    @longer ||= Enumerator.new do |yielder|
-      @@fib = Hash.new{ |h,k| h[k] = k < 2 ? k : h[k-1] + h[k-2] } # https://stackoverflow.com/questions/6418524/fibonacci-one-liner
-      loop { yielder << @@fib[(@inc ||= (3..).step).next ] }
-    end
-  end
-
   def login?
     stdin.puts "echo $0"
     stdout.gets[0] == "-"
@@ -111,6 +87,31 @@ class SH
       end
     end
   end
+
+  def read_nonblock_loop(io)
+    got = ""
+    loop do
+      begin
+        got << io.read_nonblock(1)
+      rescue IO::EAGAINWaitReadable
+        raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
+        if got.empty?
+          sleep((1/100000000000)*sleep_longer.next)
+          return read_nonblock_loop(io)
+        else
+          return got
+        end
+      end
+    end
+  end
+
+  def sleep_longer
+    @longer ||= Enumerator.new do |yielder|
+      @@fib = Hash.new{ |h,k| h[k] = k < 2 ? k : h[k-1] + h[k-2] } # https://stackoverflow.com/questions/6418524/fibonacci-one-liner
+      loop { yielder << @@fib[(@inc ||= (3..).step).next ] }
+    end
+  end
+
 end
 
 end
