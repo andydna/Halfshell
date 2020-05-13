@@ -6,10 +6,8 @@ require "open4"
 
 module Halfshell
   WAIT = 1.0/10000
-  OPEN4_RETURNS = [:pid, :in, :out, :err]
 
   class Error < StandardError; end
-  Terminal = Struct.new(:in, :out, :err, :pid, keyword_init: true)
 
   def Halfshell.new
     Typist.new(terminal: Terminal.new(**OPEN4_RETURNS.zip(Open4::popen4("sh")).to_h))

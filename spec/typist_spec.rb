@@ -11,6 +11,7 @@ RSpec.describe Halfshell::Typist do
   
   context 'reads stdout and sterr together and seperate' do
     fit 'stderr first' do
+      skip "soon"
       terminal = class_double(Halfshell::Terminal)
       expect(terminal).to receive("mkdri").and_return("ERROR")
     end
