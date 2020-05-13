@@ -56,8 +56,6 @@ class SH
     self.<< "pwd"
   end
 
-  def cwd; end
-
   def ls(*args)
     self.<< "ls #{args.join(' ')}"
   end
@@ -70,6 +68,11 @@ class SH
   def su; end
   def clear; end
   def exit; end
+
+  alias :old_inspect :inspect
+  def inspect
+    "#<#SH:#{object_id}>"
+  end
 
   def method_missing(mthd, *args, &block)
     super(mthd, *args, &block)

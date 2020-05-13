@@ -34,7 +34,7 @@ RSpec.describe HalfShell do
       end
 
       it '#cd #pwd' do
-        [:cd, :pwd, :cwd].each(&expect_to_respond_to)
+        [:cd, :pwd].each(&expect_to_respond_to)
         expect(shell.pwd).to match Regexp.new(/#{File.expand_path('.')}/i)
         shell.cd "/etc"
         expect(shell.pwd).to eq "/etc\n"
@@ -124,7 +124,7 @@ RSpec.describe HalfShell do
 
       it 'SH should use object_id for inspect instead of ?mem addr?' do
         raph = HalfShell::SH.new
-        expect(raph.inspect).to match /foo/
+        expect(raph.inspect).not_to match /0x0/
       end
     end
   end

@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "halfshell"
+require "halfshell/fibonacci_generator"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
