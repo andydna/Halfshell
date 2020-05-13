@@ -1,8 +1,6 @@
 require 'pry'
 require 'halfshell/version'
-require 'halfshell/fibonacci_generator'
 require 'halfshell/terminal'
-require "open4"
 
 module Halfshell
   WAIT = 1.0/10000
@@ -18,13 +16,12 @@ module Halfshell
   end
 
 class Typist
-  def initialize(terminal:, backoff: FibonacciEnumerator.from(3))
+  def initialize(terminal:)
     @terminal = terminal;
     # def_inspects
 
     @try = 0
     @limit = 20
-    @backoff = backoff
   end
 
   def type(*what)
@@ -43,9 +40,7 @@ class Typist
 
   def gets
     @terminal.gets
-    #return read_nonblock_loop(@terminal.out)
   end
-  alias :gets_in :gets
 
   def login?
     @terminal.puts "echo $0"

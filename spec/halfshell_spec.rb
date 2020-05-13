@@ -52,23 +52,6 @@ RSpec.describe Halfshell do
         end
       end
     end
-
-    context 'wire up open4' do
-      it 'pwd' do
-        expect(half_shell.pwd).to match /#{File.expand_path(Dir.pwd)}/i
-      end
-
-      it 'shovel in arbitrary commands' do
-        expect(half_shell << "which sh").to match Regexp.new("/bin/sh")
-      end
-
-      it 'what about garbage commands' do
-        skip "this sucks fix it"
-        expect do
-          half_shell << "mrowlatemymetalworm"
-        end.to raise_error(Halfshell::Error)
-      end
-    end
   end
 
   context "reading standard error" do
@@ -85,15 +68,6 @@ RSpec.describe Halfshell do
     end
 
     context 'fixing shit' do
-      it 'WAIT should be greater than zero' do
-        expect(Halfshell::WAIT).to be > 0
-      end
-
-      it 'should reset @try every <<' do
-        10.times { half_shell << "ls" }
-        expect(half_shell.instance_variable_get(:@try)).to eq 0
-      end
-
       it 'Typist should use object_id for inspect instead of ?mem addr?' do
         raph = Halfshell.new
         expect(raph.inspect).not_to match /0x0/
@@ -101,23 +75,7 @@ RSpec.describe Halfshell do
     end
   end
 
-  context "some commands" do
-    let(:mario) { Halfshell.new }
-    it "su" do
-      super_mario = mario.su
-    end
-  end
-
   context "Collaboration" do
-    context "with FibonacciEnumerator" do
-      it "sends #from(3) when initializing" do
-        fiberator = class_double(FibonacciEnumerator)
-        expect(fiberator).to receive(:from).with(3)
-        stub_const('FibonacciEnumerator', fiberator)
-        Halfshell.new
-      end
-    end
-
     context "w/terminal" do
       context "I can mock it; want a struct with 3 IOs and an int for pid" do
         let(:sub_shell) { spy }

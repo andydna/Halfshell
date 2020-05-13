@@ -4,7 +4,7 @@ RSpec.describe Halfshell::Terminal do
   let(:default) { Halfshell::Terminal.default }
 
   context "interface" do
-    it "should use #puts and #gets for IO because they're rubyishly obvious to me" do
+    it "#puts and #gets are Ruby-ishly obvious" do
       expect(default).to respond_to :puts
       expect(default).to respond_to :gets
     end
@@ -27,6 +27,13 @@ RSpec.describe Halfshell::Terminal do
       expect(default.gets).to match /usr/
       default.puts "asdfasdfasdf"
       expect(default.gets).to match /command not found/
+    end
+
+    it "stderr should also be readable alone" do
+      skip "i don't know how to do this yet.  wanna tee stderr to 1: back to itself 2: stderr"
+      default.puts "asdfasdfasdf"
+      expect(default.gets).to match /command not found/
+      expect(default.gets_err).to match /command not found/
     end
   end
 

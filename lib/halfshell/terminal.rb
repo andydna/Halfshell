@@ -1,3 +1,5 @@
+require "open4"
+
 module Halfshell
   class Terminal
 
@@ -24,6 +26,10 @@ module Halfshell
 
     def gets
       read_nonblock_loop(@stdout)
+    end
+
+    def gets_err
+      read_nonblock_loop(@stderr)
     end
 
     def read_nonblock_loop(io)
