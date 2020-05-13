@@ -54,24 +54,10 @@ RSpec.describe Halfshell do
     end
   end
 
-  context "reading standard error" do
-    it 'is a bad method name but ill change it' do
-      half_shell.type "asdfasfasfsadfd"
-      expect(half_shell.gets).to match /command not found/
-    end
-  end
-
-  context "making it work for me" do
-    it "STDIN, STDOUT, STDERR inspect well" do
-      skip "should be test on SlaveStruct"
-      expect(half_shell.in.inspect).to match /STDIN/
-    end
-
-    context 'fixing shit' do
-      it 'Typist should use object_id for inspect instead of ?mem addr?' do
-        raph = Halfshell.new
-        expect(raph.inspect).not_to match /0x0/
-      end
+  context "pretty in REPL" do
+    it 'Typist should use object_id for inspect instead of ?mem addr?' do
+      raph = Halfshell.new
+      expect(raph.inspect).not_to match /0x0/
     end
   end
 
