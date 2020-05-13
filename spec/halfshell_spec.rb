@@ -90,12 +90,6 @@ RSpec.describe HalfShell do
         expect(shell.stdin).to receive(:puts)
         shell.puts
       end
-
-    #  it "gets should forward to @stdout" do
-    #    expect(shell.stdout).to receive(:gets)
-    #    shell.gets
-    #  end
-
     end
 
     context "reading all the output without blocking" do
@@ -106,8 +100,7 @@ RSpec.describe HalfShell do
 
       fit "cowsay hi" do
         shell.puts "cowsay hi"
-        #sleep 1 # lame but better than nothing
-        expect(shell.gets).to eq "andy\n"
+        expect(shell.gets).to match /< hi >/
       end
     end
 

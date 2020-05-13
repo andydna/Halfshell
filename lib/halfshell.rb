@@ -31,7 +31,12 @@ class SH
       begin
         got << stdout.read_nonblock(1)
       rescue IO::EAGAINWaitReadable
-        binding.pry
+        if got.empty?
+          sleep(1/(10**100)) # gotta find a way, a better way
+          return gets
+        else
+          return got
+        end
       end
     end
   end
