@@ -4,22 +4,22 @@ RSpec.describe HalfShell do
   let(:shell) { HalfShell.new }
 
   context 'OO subshells' do
-    let(:expect_to_respond_to) do
-      lambda { |mthd| expect(shell).to respond_to mthd }
-    end
-
     context 'dead simple' do
       specify 'HalfShell << "ls spec/halfshell_spec.rb"' do
-        expect(HalfShell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb"
+        expect(HalfShell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb\n"
       end
 
       specify "hs === sh === HalfShell" do
-        expect(hs << "ls")
-        expect(sh << "ls")
+        expect(hs << "ls /").to match /bin/
+        expect(sh << "ls /").to match /bin/
+        expect(HalfShell << "ls /").to match /bin/
       end
     end
 
     context 'principle of Least Suprise' do
+      let(:expect_to_respond_to) do
+        lambda { |mthd| expect(shell).to respond_to mthd }
+      end
 
       it '#stdin #stdout #stderr #pid' do
         [:stdin, :stdout, :stderr, :pid].each(&expect_to_respond_to)
@@ -33,12 +33,17 @@ RSpec.describe HalfShell do
         expect(shell.login?).to be false
       end
 
-      it '#cd #pwd #cwd' do
+      it '#cd #pwd' do
         [:cd, :pwd, :cwd].each(&expect_to_respond_to)
+        expect(shell.pwd).to match Regexp.new(/#{File.expand_path('.')}/i)
+        shell.cd "/etc"
+        expect(shell.pwd).to eq "/etc\n"
       end
 
       it '#ls #ll' do
         [:ls, :ll,].each(&expect_to_respond_to)
+        expect(shell.ls).to include "Gemfile"
+        expect(shell.ll).to include "drwx"
       end
 
       it '#su' do
@@ -48,12 +53,11 @@ RSpec.describe HalfShell do
       it '#exit' do
         [:exit].each(&expect_to_respond_to)
       end
-    end
 
-    context 'dynamic messages mean arguments to commands' do
-
-      it '#lsa = `ls -a`, #lsb, #lsc, ... #lsz' do
-        ('a'..'z').map{|ltr|"ls#{ltr}".to_sym}.each(&expect_to_respond_to)
+      context 'dynamic messages mean arguments to commands' do
+        it '#lsa = `ls -a`, #lsb, #lsc, ... #lsz' do
+          ('a'..'z').map{|ltr|"ls#{ltr}".to_sym}.each(&expect_to_respond_to)
+        end
       end
     end
 
@@ -67,17 +71,14 @@ RSpec.describe HalfShell do
       end
 
       it 'what about garbage commands' do
-        skip "gotta figure out how to not hang"
         expect do
           shell << "mrowlatemymetalworm"
-        end.to raise_error(AndyDNA::HalfShellError)
-      end
-
-      it 'is useful for testing my own programs' do
-        skip
-        expect(shell << "./hello").to match /there/
+        end.to raise_error(HalfShell::Error)
       end
     end
+  end
+
+  context "reading standard error" do
   end
 
   context "making it work for me" do
@@ -85,29 +86,14 @@ RSpec.describe HalfShell do
       expect(shell.in.inspect).to match /STDIN/
     end
 
-    context "forwarding" do
-      it "puts should forward to @stdin" do
-        expect(shell.stdin).to receive(:puts)
-        shell.puts
-      end
+    it "#puts forwards to @stdin" do
+      expect(shell.stdin).to receive(:puts)
+      shell.puts
     end
 
-    context "reading all the output without blocking" do
-      it "whoami" do
-        shell.puts "whoami"
-        expect(shell.gets).to eq "andy\n"
-      end
-
-      fit "cowsay hi" do
-        shell.puts "cowsay hi"
-        expect(shell.gets).to match /< hi >/
-      end
+    it "#gets reads without blocking" do
+      shell.puts "cowsay hi"
+      expect(shell.gets).to match /< hi >/
     end
-
   end
-
-  it "has a version number" do
-    expect(HalfShell::VERSION).not_to be nil
-  end
-
 end

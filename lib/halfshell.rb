@@ -17,12 +17,18 @@ module HalfShell
 
 class SH
   extend Forwardable
-  #def_delegators :@stdout, :gets
   def_delegators :@stdin,  :puts
 
   def initialize
     @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
+    @try = 0
+    @limit = 1000
     def_inspects
+  end
+
+  def <<(command)
+    stdin.puts command
+    gets
   end
 
   def gets
@@ -31,19 +37,17 @@ class SH
       begin
         got << stdout.read_nonblock(1)
       rescue IO::EAGAINWaitReadable
+        # sh: ll: command not found
+
+        raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
         if got.empty?
-          sleep(1/(10**100)) # gotta find a way, a better way
+          sleep(1/(1000)) # gotta find a way, a better way
           return gets
         else
           return got
         end
       end
     end
-  end
-
-  def <<(command)
-    stdin.puts command
-    first_line
   end
 
   def pid
@@ -70,19 +74,27 @@ class SH
     stdout.gets[0] == "-"
   end
 
-  def cd; end
+  def cd(*args)
+    stdin.puts "cd #{args.join(' ')}"
+  end
+
   def pwd
     stdin.puts "pwd"
-    first_line
+    gets
   end
+
   def cwd; end
 
   def ls(*args)
     stdin.puts "ls #{args.join(' ')}"
-    first_line
+    gets
   end
 
-  def ll; end
+  def ll(*args)
+    stdin.puts "ls -l #{args.join(' ')}"
+    gets
+  end
+
   def lsh; end
 
   def clear; end
@@ -115,15 +127,15 @@ class SH
     # wanna each define_singleton_method.
     # but how to => expect(@ivar.to_s).to eq('ivar')
     def @stdin.inspect
-      "<STDIN:IO:fd #{fileno}>"
+      "#<STDIN:IO:fd #{fileno}>"
     end
 
     def @stdout.inspect
-      "<STDOUT:IO:fd #{fileno}>"
+      "#<STDOUT:IO:fd #{fileno}>"
     end
 
     def @stderr.inspect
-      "<STDERR:IO:fd #{fileno}>"
+      "#<STDERR:IO:fd #{fileno}>"
     end
   end
 end
