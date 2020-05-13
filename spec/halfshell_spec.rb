@@ -102,17 +102,24 @@ RSpec.describe HalfShell do
 
     context 'sleeping longer' do
       it 'generates acceleratingly increasing integers' do
-        first  = shell.sleep_longer.next
-        second = shell.sleep_longer.next
-        third  = shell.sleep_longer.next
+        first  = shell.send(:sleep_longer).next
+        second = shell.send(:sleep_longer).next
+        third  = shell.send(:sleep_longer).next
         expect(first).to be < second
         expect(second).to be < third
         expect(second - first).to be < (third - second)
       end
 
       it 'might as well save the fib hash to a class var for reuse' do
-        shell.sleep_longer.next
+        shell.send(:sleep_longer).next
         expect(HalfShell::SH.class_variables).to include :@@fib
+      end
+    end
+
+    context 'fixing shit' do
+      it 'should reset @try every <<' do
+        10.times { shell << "ls" }
+        expect(shell.instance_variable_get(:@try)).to eq 0
       end
     end
   end

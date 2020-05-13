@@ -97,9 +97,10 @@ class SH
       rescue IO::EAGAINWaitReadable
         raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
         if got.empty?
-          sleep((1/100000000000)*sleep_longer.next)
+          sleep((1/1000)*sleep_longer.next)
           return read_nonblock_loop(io)
         else
+          @try = 0
           return got
         end
       end
