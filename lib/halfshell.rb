@@ -1,3 +1,4 @@
+require 'halfshell/version'
 require "open4"
 require "forwardable"
 
