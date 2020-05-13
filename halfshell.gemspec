@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = HalfShell::VERSION
   spec.authors       = ["andydna"]
 
-  spec.summary       = %q{simplified, unsurprising interface for subshells}
+  spec.summary       = %q{dead simple puts|gets|<< interface for subshells}
 #  spec.description   = %q{TODO: Write a longer description or delete this line.}
   spec.homepage      = "https://github.com/andydna/halfshell"
 
