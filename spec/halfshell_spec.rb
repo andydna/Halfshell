@@ -79,6 +79,10 @@ RSpec.describe HalfShell do
   end
 
   context "reading standard error" do
+    fit 'is a bad method name but ill change it' do
+      shell.puts "asdfasfasfsadfd"
+      expect(shell.read_stderr).to match /command not found/
+    end
   end
 
   context "making it work for me" do

@@ -31,18 +31,24 @@ class SH
     gets
   end
 
+  def read_stderr
+    return read_nonblock_loop(stderr)
+  end
+
   def gets
+    return read_nonblock_loop(stdout)
+  end
+
+  def read_nonblock_loop(io)
     got = ""
     loop do
       begin
-        got << stdout.read_nonblock(1)
+        got << io.read_nonblock(1)
       rescue IO::EAGAINWaitReadable
-        # sh: ll: command not found
-
         raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
         if got.empty?
           sleep(1/(1000)) # gotta find a way, a better way
-          return gets
+          return read_nonblock_loop(io)
         else
           return got
         end
@@ -96,13 +102,8 @@ class SH
   end
 
   def lsh; end
-
-  def clear; end
-
   def su; end
-
   def clear; end
-
   def exit; end
 
   def method_missing(mthd, *args, &block)
@@ -124,17 +125,15 @@ class SH
   end
 
   def def_inspects
-    # wanna each define_singleton_method.
-    # but how to => expect(@ivar.to_s).to eq('ivar')
-    def @stdin.inspect
+    def stdin.inspect
       "#<STDIN:IO:fd #{fileno}>"
     end
 
-    def @stdout.inspect
+    def stdout.inspect
       "#<STDOUT:IO:fd #{fileno}>"
     end
 
-    def @stderr.inspect
+    def stderr.inspect
       "#<STDERR:IO:fd #{fileno}>"
     end
   end
