@@ -5,7 +5,7 @@ RSpec.describe Halfshell do
 
   context 'OO subshells' do
     context 'dead simple' do
-      fspecify 'Halfshell << "ls spec/halfshell_spec.rb"' do
+      specify 'Halfshell << "ls spec/halfshell_spec.rb"' do
         expect(Halfshell << "ls spec/halfshell_spec.rb").to eq "spec/halfshell_spec.rb\n"
       end
 
@@ -74,7 +74,7 @@ RSpec.describe Halfshell do
   context "reading standard error" do
     it 'is a bad method name but ill change it' do
       half_shell.type "asdfasfasfsadfd"
-      expect(half_shell.gets_err).to match /command not found/
+      expect(half_shell.gets).to match /command not found/
     end
   end
 
@@ -118,33 +118,14 @@ RSpec.describe Halfshell do
       end
     end
 
-    context "with Open4" do
-      it "calls popen4" do
-      skip
-        open_four = class_double(Open4)
-        expect(open_four).to receive(:popen4)
-        stub_const('Open4', open_four)
-        Halfshell.new
-      end
-
+    context "w/terminal" do
       context "I can mock it; want a struct with 3 IOs and an int for pid" do
-        # standard_streams or process
-        # except i'm abstractly passing in a shell
-        # so call it a shell
         let(:sub_shell) { spy }
         
-        it "Typist#type calls @terminal#stdin then @terminal#puts" do
-          expect(sub_shell).to receive(:in)
+        it "Typist#type calls @terminal#gets then @terminal#puts" do
+          expect(sub_shell).to receive(:gets)
           expect(sub_shell).to receive(:puts)
-          Halfshell::Typist.new(terminal: sub_shell).type
-        end
-
-        it "#gets reads without blocking" do
-          half_shell.type "cowsay hi"
-          expect(half_shell.gets).to match /< hi >/
-        end
-        specify "" do
-          not_open_four = double
+          Halfshell::Typist.new(terminal: sub_shell).type("ls").gets
         end
       end
     end

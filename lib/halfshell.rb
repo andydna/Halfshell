@@ -10,7 +10,7 @@ module Halfshell
   class Error < StandardError; end
 
   def Halfshell.new
-    Typist.new(terminal: Terminal.new(**OPEN4_RETURNS.zip(Open4::popen4("sh")).to_h))
+    Typist.new(terminal: Terminal.default)
   end
 
   def Halfshell.<<(command)
@@ -28,12 +28,12 @@ class Typist
   end
 
   def type(*what)
-    @terminal.in.puts(*what)
+    @terminal.puts(*what)
     self
   end
 
   def <<(command)
-    @terminal.in.puts command
+    @terminal.puts command
     gets
   end
 
@@ -42,17 +42,18 @@ class Typist
   end
 
   def gets
-    return read_nonblock_loop(@terminal.out)
+    @terminal.gets
+    #return read_nonblock_loop(@terminal.out)
   end
   alias :gets_in :gets
 
   def login?
-    @terminal.in.puts "echo $0"
-    @terminal.out.gets[0] == "-"
+    @terminal.puts "echo $0"
+    @terminal.gets[0] == "-"
   end
 
   def cd(*args)
-    @terminal.in.puts "cd #{args.join(' ')}"
+    @terminal.puts "cd #{args.join(' ')}"
   end
 
   # actual commands
@@ -101,23 +102,6 @@ class Typist
 #    end
 #  end
 
-  def read_nonblock_loop(io)
-    got = ""
-    loop do
-      begin
-        got << io.read_nonblock(1)
-      rescue IO::EAGAINWaitReadable
-        raise(Error, "no in") if (@try += 1) > @limit # should just return err; later
-        if got.empty?
-          sleep(WAIT*@backoff.next)
-          return read_nonblock_loop(io)
-        else
-          @try = 0
-          return got
-        end
-      end
-    end
-  end
 end
 
 end
