@@ -1,7 +1,7 @@
 module Halfshell
 
 class Typist
-  def initialize(terminal:)
+  def initialize(terminal: Terminal.default)
     @terminal = terminal;
 
     @try = 0
