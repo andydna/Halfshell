@@ -3,37 +3,34 @@ require 'spec_helper'
 RSpec.describe Halfshell::Typist do
   let(:typist) { Halfshell::Typist.new }
 
-  specify 'Typist#type returns self' do
+  specify 'Typist#type is chainable' do
     typist = Halfshell::Typist.new(terminal: spy)
     expect(typist.type("ls").type("ls")).to eq typist
   end
 
   context 'reads stdout and sterr together and seperate' do
+    skip # this kinda sucks but i wanna stay rolling
     it 'stderr first' do
-      skip "soon"
-      terminal = class_double(Halfshell::Terminal)
-      expect(terminal).to receive("mkdri").and_return("ERROR")
+      terminal = instance_double(Halfshell::Terminal)
+      expect(terminal).to receive(:puts).with("mkdri").and_return("ERROR")
+      typist = Halfshell::Typist.new(terminal: terminal)
+      typist.type("mkdri")
     end
   end
 
-  context "pretty in REPL" do
-    it 'Typist should use object_id for inspect instead of ?mem addr?' do
-      raph = Halfshell.new
-      expect(raph.inspect).not_to match /0x0/
-    end
+  it 'should look good in the repl' do
+    raph = Halfshell.new
+    expect(raph.inspect).not_to match /0x0/
   end
 
-  context "Collaboration" do
-
-    context "w/terminal" do
-      context "I can mock it; want a struct with 3 IOs and an int for pid" do
-        let(:terminal) { spy }
-        
-        it "Typist#type calls @terminal#gets then @terminal#puts" do
-          expect(terminal).to receive(:gets)
-          expect(terminal).to receive(:puts)
-          Halfshell::Typist.new(terminal: terminal).type("ls").gets
-        end
+  context "Collaboration w/terminal" do
+    context "I can mock it; want a struct with 3 IOs and an int for pid" do
+      let(:terminal) { spy }
+      
+      it "Typist#type calls @terminal#gets then @terminal#puts" do
+        expect(terminal).to receive(:gets)
+        expect(terminal).to receive(:puts)
+        Halfshell::Typist.new(terminal: terminal).type("ls").gets
       end
     end
   end
