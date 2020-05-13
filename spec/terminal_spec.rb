@@ -41,7 +41,7 @@ RSpec.describe Halfshell::Terminal do
 
   context "interactive programs" do
     it "ri" do
-      default.puts "ri"
+      default.puts "/usr/bin/ri"
       expect(default.gets).to match />> /
     end
   end
