@@ -10,6 +10,7 @@ module Halfshell
   end
 
   def Halfshell.<<(command)
+    return ($hs = new) if :global == command
     new << command
   end
 end

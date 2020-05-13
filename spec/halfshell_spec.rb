@@ -13,5 +13,11 @@ RSpec.describe Halfshell do
       expect(sh << "ls /").to match /bin/
       expect(Halfshell << "ls /").to match /bin/
     end
+
+    it "maybe you want a single global $sh" do
+      Halfshell << :global
+      expect($hs << 'pwd').to match /#{Dir.pwd}/
+    end
   end
+
 end
