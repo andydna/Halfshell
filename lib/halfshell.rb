@@ -1,6 +1,7 @@
 require 'pry'
 require 'halfshell/version'
 require 'halfshell/fibonacci_generator'
+require 'halfshell/terminal'
 require "open4"
 
 module Halfshell
