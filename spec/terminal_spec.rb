@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+$testing = true
+
 RSpec.describe Halfshell::Terminal do
   let(:default) { Halfshell::Terminal.default }
 
@@ -42,5 +44,9 @@ RSpec.describe Halfshell::Terminal do
       default.puts "ri"
       expect(default.gets).to match />> /
     end
+  end
+
+  context "raise_error binding.pry if $testing" do
+    skip "i don't know how to test this yet"
   end
 end

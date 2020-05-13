@@ -55,7 +55,7 @@ module Halfshell
     end
 
     def raise_error
-      binding.pry
+      binding.pry if $testing
       raise Error
     end
   end
