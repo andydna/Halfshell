@@ -121,6 +121,11 @@ RSpec.describe HalfShell do
         10.times { shell << "ls" }
         expect(shell.instance_variable_get(:@try)).to eq 0
       end
+
+      it 'SH should use object_id for inspect instead of ?mem addr?' do
+        raph = HalfShell::SH.new
+        expect(raph.inspect).to match /foo/
+      end
     end
   end
 end
