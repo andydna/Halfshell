@@ -42,7 +42,7 @@ RSpec.describe Halfshell::Terminal do
   context "interactive programs" do
     it "su" do
       default.puts "su"
-      expect(default.gets).to match /Password/
+      expect(default.gets).to match /Password|Sorry/
     end
   end
 

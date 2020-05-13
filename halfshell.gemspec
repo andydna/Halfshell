@@ -4,7 +4,7 @@ require "halfshell/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "halfshell"
-  spec.version       = HalfShell::VERSION
+  spec.version       = Halfshell::VERSION
   spec.authors       = ["andydna"]
 
   spec.summary       = %q{dead simple puts|gets|<< interface for subshells}
