@@ -79,9 +79,9 @@ RSpec.describe HalfShell do
   end
 
   context "reading standard error" do
-    fit 'is a bad method name but ill change it' do
+    it 'is a bad method name but ill change it' do
       shell.puts "asdfasfasfsadfd"
-      expect(shell.read_stderr).to match /command not found/
+      expect(shell.gets_err).to match /command not found/
     end
   end
 
@@ -99,5 +99,20 @@ RSpec.describe HalfShell do
       shell.puts "cowsay hi"
       expect(shell.gets).to match /< hi >/
     end
+
+
   end
 end
+
+RSpec.describe HalfShell::SleepGenerator do
+  let(:gen) {HalfShell::SleepGenerator}
+  it 'generates acceleratingly increasing integers' do
+    first  = gen.next
+    second = gen.next
+    third  = gen.next
+    expect(first).to be < second
+    expect(second).to be < third
+    expect(second - first).to be < (third - second)
+  end
+end
+

@@ -1,9 +1,12 @@
-require "halfshell/version"
-
 require "open4"
 require "forwardable"
 
 module HalfShell
+  SleepGenerator = Enumerator.new do |yielder|
+    inc  = (3..).step
+    fib = Hash.new{ |h,k| h[k] = k < 2 ? k : h[k-1] + h[k-2] } # https://stackoverflow.com/questions/6418524/fibonacci-one-liner
+    loop {yielder << fib[inc.next]}
+  end
 
   class Error < StandardError; end
 
@@ -31,7 +34,7 @@ class SH
     gets
   end
 
-  def read_stderr
+  def gets_err
     return read_nonblock_loop(stderr)
   end
 
@@ -115,14 +118,6 @@ class SH
   end
 
   private
-
-  def first_line
-    stdout.each_line.take(1).join.strip #shitty
-  end
-
-  def two_lines
-    stdout.each_line.take(2).join # shitty
-  end
 
   def def_inspects
     def stdin.inspect
