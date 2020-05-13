@@ -1,27 +1,30 @@
 require 'halfshell/version'
 require "open4"
-require "forwardable"
 
 module HalfShell
+  OPEN4_RETURNS = [:pid, :stdin, :stdout, :stderr]
+  WAIT = 1/1000
+
   class Error < StandardError; end
 
   def HalfShell.new
-    SH.new
+    SH.new(slave: SubShell.new(**OPEN4_RETURNS.zip(Open4::popen4("sh")).to_h))
   end
 
   def HalfShell.<<(command)
     new << command
   end
 
-class SH
-  extend Forwardable
-  def_delegators :@stdin,  :puts
+  SubShell = Struct.new(:stdin, :stdout, :stderr, :pid, keyword_init: true)
 
-  def initialize
-    @pid, @stdin, @stdout, @stderr = Open4::popen4 "sh"
+class SH
+  def initialize(slave:, backoff: FibonacciEnumerator.from(3))
+    @slave = slave;
+    def_inspects
+
     @try = 0
     @limit = 1000
-    def_inspects
+    @backoff = backoff
   end
 
   attr_reader :pid, :stdin, :stdout, :stderr
@@ -29,27 +32,31 @@ class SH
   alias :out :stdout
   alias :err :stderr
 
+  def puts(*what)
+    @slave.stdin.puts(*what)
+  end
+
   def <<(command)
-    stdin.puts command
+    @slave.stdin.puts command
     gets
   end
 
   def gets_err
-    return read_nonblock_loop(stderr)
+    return read_nonblock_loop(@slave.stderr)
   end
 
   def gets
-    return read_nonblock_loop(stdout)
+    return read_nonblock_loop(@slave.stdout)
   end
   alias :gets_in :gets
 
   def login?
-    stdin.puts "echo $0"
-    stdout.gets[0] == "-"
+    @slave.stdin.puts "echo $0"
+    @slave.stdout.gets[0] == "-"
   end
 
   def cd(*args)
-    stdin.puts "cd #{args.join(' ')}"
+    @slave.stdin.puts "cd #{args.join(' ')}"
   end
 
   def pwd
@@ -100,7 +107,7 @@ class SH
       rescue IO::EAGAINWaitReadable
         raise(Error, "no stdin") if (@try += 1) > @limit # should just return stderr; later
         if got.empty?
-          sleep((1/1000)*sleep_longer.next)
+          sleep(WAIT*@backoff.next)
           return read_nonblock_loop(io)
         else
           @try = 0
@@ -109,14 +116,6 @@ class SH
       end
     end
   end
-
-  def sleep_longer
-    @longer ||= Enumerator.new do |yielder|
-      @@fib = Hash.new{ |h,k| h[k] = k < 2 ? k : h[k-1] + h[k-2] } # https://stackoverflow.com/questions/6418524/fibonacci-one-liner
-      loop { yielder << @@fib[(@inc ||= (3..).step).next ] }
-    end
-  end
-
 end
 
 end

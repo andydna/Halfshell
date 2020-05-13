@@ -1,7 +1,7 @@
 require 'pry'
 
 RSpec.describe HalfShell do
-  let(:shell) { HalfShell.new }
+  let(:half_shell) { HalfShell.new }
 
   context 'OO subshells' do
     context 'dead simple' do
@@ -18,7 +18,7 @@ RSpec.describe HalfShell do
 
     context 'principle of Least Suprise' do
       let(:expect_to_respond_to) do
-        lambda { |mthd| expect(shell).to respond_to mthd }
+        lambda { |mthd| expect(half_shell).to respond_to mthd }
       end
 
       it '#stdin #stdout #stderr #pid' do
@@ -30,20 +30,20 @@ RSpec.describe HalfShell do
       end
 
       it '#login?' do
-        expect(shell.login?).to be false
+        expect(half_shell.login?).to be false
       end
 
       it '#cd #pwd' do
         [:cd, :pwd].each(&expect_to_respond_to)
-        expect(shell.pwd).to match Regexp.new(/#{File.expand_path('.')}/i)
-        shell.cd "/etc"
-        expect(shell.pwd).to eq "/etc\n"
+        expect(half_shell.pwd).to match Regexp.new(/#{File.expand_path('.')}/i)
+        half_shell.cd "/etc"
+        expect(half_shell.pwd).to eq "/etc\n"
       end
 
       it '#ls #ll' do
         [:ls, :ll,].each(&expect_to_respond_to)
-        expect(shell.ls).to include "Gemfile"
-        expect(shell.ll).to include "drwx"
+        expect(half_shell.ls).to include "Gemfile"
+        expect(half_shell.ll).to include "drwx"
       end
 
       it '#su' do
@@ -63,16 +63,16 @@ RSpec.describe HalfShell do
 
     context 'wire up open4' do
       it 'pwd' do
-        expect(shell.pwd).to match /#{File.expand_path(Dir.pwd)}/i
+        expect(half_shell.pwd).to match /#{File.expand_path(Dir.pwd)}/i
       end
 
       it 'shovel in arbitrary commands' do
-        expect(shell << "which sh").to match Regexp.new("/bin/sh")
+        expect(half_shell << "which sh").to match Regexp.new("/bin/sh")
       end
 
       it 'what about garbage commands' do
         expect do
-          shell << "mrowlatemymetalworm"
+          half_shell << "mrowlatemymetalworm"
         end.to raise_error(HalfShell::Error)
       end
     end
@@ -80,51 +80,68 @@ RSpec.describe HalfShell do
 
   context "reading standard error" do
     it 'is a bad method name but ill change it' do
-      shell.puts "asdfasfasfsadfd"
-      expect(shell.gets_err).to match /command not found/
+      half_shell.puts "asdfasfasfsadfd"
+      expect(half_shell.gets_err).to match /command not found/
     end
   end
 
   context "making it work for me" do
     it "STDIN, STDOUT, STDERR inspect well" do
-      expect(shell.in.inspect).to match /STDIN/
-    end
-
-    it "#puts forwards to @stdin" do
-      expect(shell.stdin).to receive(:puts)
-      shell.puts
-    end
-
-    it "#gets reads without blocking" do
-      shell.puts "cowsay hi"
-      expect(shell.gets).to match /< hi >/
-    end
-
-    context 'sleeping longer' do
-      it 'generates acceleratingly increasing integers' do
-        first  = shell.send(:sleep_longer).next
-        second = shell.send(:sleep_longer).next
-        third  = shell.send(:sleep_longer).next
-        expect(first).to be < second
-        expect(second).to be < third
-        expect(second - first).to be < (third - second)
-      end
-
-      it 'might as well save the fib hash to a class var for reuse' do
-        shell.send(:sleep_longer).next
-        expect(HalfShell::SH.class_variables).to include :@@fib
-      end
+      skip "should be test on SlaveStruct"
+      expect(half_shell.in.inspect).to match /STDIN/
     end
 
     context 'fixing shit' do
       it 'should reset @try every <<' do
-        10.times { shell << "ls" }
-        expect(shell.instance_variable_get(:@try)).to eq 0
+        10.times { half_shell << "ls" }
+        expect(half_shell.instance_variable_get(:@try)).to eq 0
       end
 
       it 'SH should use object_id for inspect instead of ?mem addr?' do
-        raph = HalfShell::SH.new
+        raph = HalfShell.new
         expect(raph.inspect).not_to match /0x0/
+      end
+    end
+  end
+
+  context "Collaboration" do
+    context "with FibonacciEnumerator" do
+      it "sends #from(3) when initializing" do
+        fiberator = class_double(FibonacciEnumerator)
+        expect(fiberator).to receive(:from).with(3)
+        stub_const('FibonacciEnumerator', fiberator)
+        HalfShell.new
+      end
+    end
+
+    context "with Open4" do
+      it "calls popen4" do
+      skip
+        open_four = class_double(Open4)
+        expect(open_four).to receive(:popen4)
+        stub_const('Open4', open_four)
+        HalfShell.new
+      end
+
+      context "I can mock it; want a struct with 3 IOs and an int for pid" do
+        # standard_streams or process
+        # except i'm abstractly passing in a shell
+        # so call it a shell
+        let(:sub_shell) { spy }
+        
+        it "SH#puts calls @slave#stdin then @slave#puts" do
+          expect(sub_shell).to receive(:stdin)
+          expect(sub_shell).to receive(:puts)
+          HalfShell::SH.new(slave: sub_shell).puts
+        end
+
+        it "#gets reads without blocking" do
+          half_shell.puts "cowsay hi"
+          expect(half_shell.gets).to match /< hi >/
+        end
+        specify "" do
+          not_open_four = double
+        end
       end
     end
   end
