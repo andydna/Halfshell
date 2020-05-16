@@ -44,5 +44,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "open4", "~> 1.3.4"
 
-  spec.required_ruby_version = ">= 2.6"
+  spec.required_ruby_version = ">= 2.3"
 end
