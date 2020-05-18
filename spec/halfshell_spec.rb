@@ -18,6 +18,10 @@ RSpec.describe Halfshell do
       Halfshell << :global
       expect($hs << 'pwd').to match /#{Dir.pwd}/
     end
-  end
 
+    it "can return a zsh" do
+      zsh = Halfshell.zsh
+      expect(zsh.type("echo $0").gets).to match /zsh/
+    end
+  end
 end
