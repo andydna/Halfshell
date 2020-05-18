@@ -4,12 +4,16 @@ module Halfshell
   class Terminal
 
     def Terminal.default
-      Terminal.popen4
+      Terminal.sh
+    end
+
+    def Terminal.zsh
+      Terminal.new(**OPEN4_RETURNS.zip(Open4::popen4("zsh 2>&1")).to_h)
     end
 
     OPEN4_RETURNS = [:pid, :stdin, :stdout, :stderr]
 
-    def Terminal.popen4
+    def Terminal.sh
       Terminal.new(**OPEN4_RETURNS.zip(Open4::popen4("sh 2>&1")).to_h)
     end
 

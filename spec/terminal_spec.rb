@@ -49,4 +49,14 @@ RSpec.describe Halfshell::Terminal do
   context "raise_error binding.pry if $testing" do
     skip "i don't know how to test this yet"
   end
+
+  context "i need a zsh so i can map `where mybin.next` and figure out how i fucked up make/awk" do
+    it "exists" do
+      zsh = Halfshell::Terminal.zsh
+      expect(zsh)
+
+      zsh.puts "where ls"
+      expect(zsh.gets).not_to match /line 1: where: command not found/
+    end
+  end
 end
