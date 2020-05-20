@@ -1,4 +1,3 @@
-require "pry"
 require "bundler/setup"
 require "halfshell"
 

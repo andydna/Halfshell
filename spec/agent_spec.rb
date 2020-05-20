@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe Halfshell::Typist do
-  let(:typist) { Halfshell::Typist.new }
+RSpec.describe Halfshell::Agent do
+  let(:typist) { Halfshell::Agent.new }
 
-  specify 'Typist#type is chainable' do
-    typist = Halfshell::Typist.new(terminal: spy)
+  specify 'Agent#type is chainable' do
+    typist = Halfshell::Agent.new(terminal: spy)
     expect(typist.type("ls").type("ls")).to eq typist
   end
 
@@ -13,7 +13,7 @@ RSpec.describe Halfshell::Typist do
     it 'stderr first' do
       terminal = instance_double(Halfshell::Terminal)
       expect(terminal).to receive(:puts).with("mkdri").and_return("ERROR")
-      typist = Halfshell::Typist.new(terminal: terminal)
+      typist = Halfshell::Agent.new(terminal: terminal)
       typist.type("mkdri")
     end
   end
@@ -27,10 +27,10 @@ RSpec.describe Halfshell::Typist do
     context "I can mock it; want a struct with 3 IOs and an int for pid" do
       let(:terminal) { spy }
       
-      it "Typist#type calls @terminal#gets then @terminal#puts" do
+      it "Agent#type calls @terminal#gets then @terminal#puts" do
         expect(terminal).to receive(:gets)
         expect(terminal).to receive(:puts)
-        Halfshell::Typist.new(terminal: terminal).type("ls").gets
+        Halfshell::Agent.new(terminal: terminal).type("ls").gets
       end
     end
   end

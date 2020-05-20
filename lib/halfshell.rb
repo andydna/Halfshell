@@ -1,6 +1,6 @@
 require 'halfshell/version'
 require 'halfshell/terminal'
-require 'halfshell/typist'
+require 'halfshell/agent'
 
 module Halfshell
   class Error < StandardError; end
@@ -11,11 +11,11 @@ module Halfshell
   end
 
   def Halfshell.new
-    Typist.new(terminal: Terminal.default)
+    Agent.new(terminal: Terminal.default)
   end
 
   def Halfshell.zsh
-    Typist.new(terminal: Terminal.zsh)
+    Agent.new(terminal: Terminal.zsh)
   end
 end
 

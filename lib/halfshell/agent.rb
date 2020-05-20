@@ -1,6 +1,6 @@
 module Halfshell
 
-class Typist
+class Agent
   def initialize(terminal: Terminal.default)
     @terminal = terminal;
 
@@ -50,7 +50,7 @@ class Typist
 
   alias :old_inspect :inspect
   def inspect
-    "#<#Typist:#{object_id}>"
+    "#<#{self.class}:#{object_id}>"
   end
 
   def method_missing(mthd, *args, &block)

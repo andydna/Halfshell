@@ -1,5 +1,3 @@
-require 'pry'
-
 RSpec.describe Halfshell do
   let(:half_shell) { Halfshell.new }
 
