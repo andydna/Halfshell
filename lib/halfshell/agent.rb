@@ -8,7 +8,7 @@ class Agent
     @limit = 20
   end
 
-  def type(*what)
+  def puts(*what)
     @terminal.puts(*what)
     self
   end

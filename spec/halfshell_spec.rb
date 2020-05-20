@@ -19,7 +19,7 @@ RSpec.describe Halfshell do
 
     it "can return a zsh" do
       zsh = Halfshell.zsh
-      expect(zsh.type("echo $0").gets).to match /zsh/
+      expect(zsh.puts("echo $0").gets).to match /zsh/
     end
   end
 end
