@@ -43,6 +43,7 @@ module Halfshell
       got = ""
       loop do
         begin
+          @tries += 1
           got << io.read_nonblock(1)
         rescue IO::EAGAINWaitReadable
           raise_error if too_many_tries?
