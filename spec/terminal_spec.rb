@@ -59,4 +59,5 @@ RSpec.describe Halfshell::Terminal do
       expect(zsh.gets).not_to match /line 1: where: command not found/
     end
   end
+
 end

@@ -1,3 +1,5 @@
+require "pry"
+
 RSpec.describe Halfshell do
   let(:half_shell) { Halfshell.new }
 
@@ -20,28 +22,6 @@ RSpec.describe Halfshell do
     it "can return a zsh" do
       zsh = Halfshell.zsh
       expect(zsh.puts("echo $0").gets).to match /zsh/
-    end
-
-    context "doesn't hang on which" do
-      context "when which $DOES_EXIST" do
-        it 'Halfshell << "which ls"' do
-          expect(Halfshell << "which ls").to match /bin\/ls/
-        end
-
-        it 'Halfshell.new << "which ls"' do
-          expect(Halfshell.new << "which ls").to match /bin\/ls/
-        end
-
-        it 'Halfshell.zsh << "which ls"' do
-          expect(Halfshell.zsh << "which ls").to match /bin\/ls/
-        end
-      end
-
-      context "when which $DOES_NOT_EXIST" do
-        fit "#<<" do
-          expect(Halfshell << "which asdfasdfasdf").to match /foo/
-        end
-      end
     end
   end
 end
